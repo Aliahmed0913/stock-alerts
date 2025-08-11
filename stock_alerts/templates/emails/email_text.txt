@@ -1,0 +1,9 @@
+Hello {{ user.username }},
+
+Your stock alert for {{ alert.stock_symbol }} has been triggered.
+
+Current price: {{ current_price }}
+Condition: {{ alert.comparison }}
+
+Thank you,
+Stock Alerts Team

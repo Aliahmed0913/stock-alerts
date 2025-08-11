@@ -33,13 +33,13 @@ class AlertCreateSerializer(serializers.ModelSerializer):
         comparison = attrs.get('comparison')
         duration = attrs.get('duration')
         
-        if target_price <= 0 :
+        if target_price <= 0.01 :
             raise serializers.ValidationError({'Price_issue':'Your target price can\'t be zero or less.'}) 
                      
         if symbol not in STOCK_SYMBOLS:
-            raise serializers.ValidationError({'Stock_symbol':'Unsupported stock symbol.!'})
+            raise serializers.ValidationError({'Stock_symbol':'Unsupported stock symbol. or using lowercase!'})
         
-        if alert_type == 'threshold' :
+        if alert_type =='threshold' :
             attrs['duration'] = timedelta(0)
         
         alert_conditions = {
@@ -72,7 +72,6 @@ class AlertCreateSerializer(serializers.ModelSerializer):
         target_price = Decimal(validated_data['target_price']),
         comparison = validated_data['comparison'],
         duration = validated_data['duration'])
-    
                                                     
                                                     
 class TriggeredAlertSerializer(serializers.ModelSerializer):

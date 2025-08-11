@@ -1,10 +1,11 @@
 from django.shortcuts import render, get_object_or_404
-from rest_framework.decorators import api_view 
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import RegisterUserSerializer
+from .serializers import RegisterUserSerializer, UserNotificationSerializer
 from django.contrib.auth import get_user_model
-
+from .models import UserNotificationSetting
 # Create your views here.  IsAuthenticated
 user = get_user_model()
 @api_view(['POST','GET'])
@@ -21,4 +22,22 @@ def register_user(request):
     else:
         serializer = RegisterUserSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
-           
+    
+
+@api_view(['PATCH','GET'])
+@permission_classes([IsAuthenticated])
+def notification_setting_update(request):
+    try:
+        notification_setting = UserNotificationSetting.objects.get(user = request.user)
+    except UserNotificationSerializer.DoesNotExist:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+    
+    if request.method == 'GET':
+        serializer = UserNotificationSerializer(notification_setting)
+        return Response(serializer.data)
+    
+    serializer = UserNotificationSerializer(notification_setting, data = request.data, partial = True )
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)

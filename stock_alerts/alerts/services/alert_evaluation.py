@@ -3,7 +3,7 @@ from .triggers import threshold_trigger,duration_trigger
 from .fetch_prices import request_for_prices
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('alerts')
 
 def active_untriggered_alert_symbols():
     active_alerts = Alert.objects.filter(has_triggered = False, is_active = True)

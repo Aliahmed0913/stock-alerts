@@ -1,6 +1,6 @@
 from stock_alerts.settings import API_KEY
 import requests, logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('alerts')
 
 
 def request_for_prices(stock_symbols:list[str]):  #'AAPL','MSFT','GOOGL','TSLA','AMZN','META','NVDA','JPM','JNJ','PG'  
@@ -10,17 +10,15 @@ def request_for_prices(stock_symbols:list[str]):  #'AAPL','MSFT','GOOGL','TSLA',
             twelvedata_url = f"https://api.twelvedata.com/price?symbol={symbol}&apikey={API_KEY}"
             response = requests.get(twelvedata_url, timeout=5)
             
-            if response.status_code >= 500:
-                logger.warning('Missing price for %s',symbol)
-                continue
-            
             response.raise_for_status()
             symbol_price = response.json()
 
             if 'price' in symbol_price:
                 prices[symbol] = float(symbol_price['price'])
+                logger.warning("{%s} Price: %s", symbol,prices[symbol])
             else:
-                prices[symbol] = None
+                logger.warning("Price not found in API response for %s: %s", symbol, symbol_price)
+                continue  
 
     
         except requests.exceptions.RequestException as e:

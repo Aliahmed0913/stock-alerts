@@ -2,9 +2,10 @@ from alerts.models import Alert, TriggeredAlert
 from django.utils import timezone 
 from django.core.cache import cache
 from datetime import datetime
+from notifications.services.email_sender import publish_alerts_emails
 
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('alerts')
 
 def stock_current_price(stock_symbol,current_prices):
     try:
@@ -21,7 +22,7 @@ def trigger_alert(alert:Alert, current_price):
     
     TriggeredAlert.objects.create(alert = alert,
                                       trigger_price = current_price,
-                                      triggered_at = timezone.now(),
+                                      triggered_at = alert.triggered_at,
                                       triggered_method = alert.alert_type)
    
     logger.info('%s alert has triggered for {%s:%s}',alert.alert_type,alert.stock_symbol,alert.id)
@@ -31,9 +32,8 @@ def threshold_trigger(alert:Alert, current_prices):
     current_price = stock_current_price(alert.stock_symbol, current_prices)
     
     if check_conditions(alert,current_price):
-        trigger_alert(alert, current_price)  
-        return True
-    
+        trigger_alert(alert, current_price)
+        return True  
     return False
     
 
@@ -46,6 +46,7 @@ def duration_trigger(alert:Alert, current_prices):
         
         if not cached_start_time:
             cache.set(cach_key, timezone.now().isoformat(),timeout = None)
+            logger.warning('%s alert not met yet for {%s:%s}',alert.alert_type,alert.stock_symbol,alert.id)
             return False
         else:
             duration_start_time = datetime.fromisoformat(cached_start_time)
@@ -56,13 +57,13 @@ def duration_trigger(alert:Alert, current_prices):
                 cache.delete(cach_key)
                 return True
             
-    cache.delete(cach_key)    
+    cache.delete(cach_key)
     return False    
             
 
 def check_conditions(alert:Alert,current_price):
     if current_price is None:
-        logger.error('%s current price not founded!',alert.stock_symbol)
+        logger.warning('%s current price not founded!',alert.stock_symbol)
         return False
     
     result = (
@@ -70,5 +71,7 @@ def check_conditions(alert:Alert,current_price):
     (alert.comparison == '<' and alert.target_price > current_price)or 
     (alert.comparison == '=' and alert.target_price == current_price)
     ) and not alert.has_triggered
-      
-    return result
+    
+    if not result:
+        logger.warning('%s alert conditions not satisfied yet for {%s:%s}',alert.alert_type,alert.stock_symbol,alert.id)    
+    return result    

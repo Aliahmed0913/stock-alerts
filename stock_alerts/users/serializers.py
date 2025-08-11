@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import User
+from .models import User, UserNotificationSetting
+
 class RegisterUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True,min_length=8, max_length=15)
     
@@ -8,7 +9,13 @@ class RegisterUserSerializer(serializers.ModelSerializer):
         fields = ['username', 'email', 'phone_num', 'password']
     
     def create(self,validated_data):
-        return User.objects.create_user(username=validated_data['username'],
-                                        email=validated_data['email'],
-                                        password=validated_data['password'],
-                                        phone_num=validated_data['phone_num'])
+        user = User.objects.create_user(**validated_data)
+        UserNotificationSetting.objects.create(user = user)
+        return user
+    
+class UserNotificationSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(read_only = True)
+    
+    class Meta():
+        model = UserNotificationSetting
+        fields = ['user', 'enable_email', 'cooldown_period', 'last_notified']

@@ -74,7 +74,9 @@ ROOT_URLCONF = 'stock_alerts.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR,'templates')
+            ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -161,21 +163,70 @@ CACHES = {
         }
     }
 }
-from alerts.celery_schedule import CELERY_BEAT_SCHEDULE
+from .celery_schedule import CELERY_BEAT_SCHEDULE
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 
 LOGGING = {
-    'version': 1,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
+    'version': 1,  # Required by Python logging module
+    'disable_existing_loggers': False,  # Keeps Django's default logs
+
+    'formatters': {  # How the log message will look
+        'verbose': {
+            'format': '[{asctime}] {levelname} in {name}: {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname}: {message}',
+            'style': '{',
         },
     },
-    'root': {
-        'handlers': ['console'],
-        'level': 'DEBUG',
+
+    'handlers': {
+        # Console handler → shows logs in terminal during development
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+
+        # # File handler for ALL logs in production
+        'file_notifications': {
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'notifications.log'),
+            'formatter': 'verbose',
+        },
+
+        # File handler only for alert/email-related logs
+        'file_alerts': {
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'alerts.log'),
+            'formatter': 'verbose',
+        },
+    },
+
+    'loggers': {
+        # Default Django logger (handles general logs)
+        'notifications': {
+            'handlers': ['console', 'file_notifications'],
+            'level': 'DEBUG',  
+            'propagate': False,
+        },
+
+        # Custom logger for alerts
+        'alerts': {
+            'handlers': ['console', 'file_alerts'],
+            'level': 'DEBUG',  
+            'propagate': False,  
+        },
     },
 }
+
+EMAIL_BACKEND=env('EMAIL_BACKEND')
+EMAIL_HOST=env('EMAIL_HOST')
+EMAIL_PORT=env('EMAIL_PORT')
+EMAIL_USE_TLS=env('EMAIL_USE_TLS')
+EMAIL_HOST_USER=env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD=env('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL=env('DEFAULT_FROM_EMAIL')
