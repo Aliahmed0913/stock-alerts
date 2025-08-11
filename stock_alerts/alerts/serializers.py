@@ -78,4 +78,4 @@ class TriggeredAlertSerializer(serializers.ModelSerializer):
     alert_id = serializers.IntegerField(source = 'alert.id', read_only = True)
     class Meta():
         model = TriggeredAlert
-        fields = ['alert_id', 'trigger_price', 'triggered_at', 'triggered_method']
+        fields = ['alert_id', 'trigger_price', 'triggered_at', 'triggered_method','notification_status','notification_attempt_at','attempts_num']

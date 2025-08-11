@@ -140,3 +140,13 @@
 [2025-08-11 08:57:28,598] INFO in alerts: Start scheduled alert evaluation...
 [2025-08-11 08:57:28,600] WARNING in alerts: There is no alert to tracking!
 [2025-08-11 08:57:28,600] INFO in alerts: Evaluation completed
+[2025-08-11 13:52:35,925] INFO in alerts: Start scheduled alert evaluation...
+[2025-08-11 13:52:36,465] WARNING in alerts: {GOOGL} Price: 201.42
+[2025-08-11 13:52:36,465] INFO in alerts: Prices has successfully fetched from external API
+[2025-08-11 13:52:36,487] INFO in alerts: threshold alert has triggered for {GOOGL:3}
+[2025-08-11 13:52:36,487] INFO in alerts: Evaluation completed
+[2025-08-11 14:10:33,208] INFO in alerts: Start scheduled alert evaluation...
+[2025-08-11 14:10:33,592] WARNING in alerts: {TSLA} Price: 329.64999
+[2025-08-11 14:10:33,593] INFO in alerts: Prices has successfully fetched from external API
+[2025-08-11 14:10:33,627] INFO in alerts: threshold alert has triggered for {TSLA:4}
+[2025-08-11 14:10:33,628] INFO in alerts: Evaluation completed
