@@ -19,7 +19,6 @@ djangorestframework_simplejwt==5.5.1
 idna==3.10
 iniconfig==2.1.0
 kombu==5.5.4
-mysql==0.0.3
 mysqlclient==2.2.7
 packaging==25.0
 pluggy==1.6.0
@@ -27,8 +26,6 @@ prompt_toolkit==3.0.51
 pycparser==2.22
 Pygments==2.19.2
 PyJWT==2.10.1
-pytest==8.4.1
-pytest-django==4.11.1
 python-dateutil==2.9.0.post0
 redis==6.3.0
 requests==2.32.4
