@@ -5,11 +5,6 @@ import logging
 
 logger = logging.getLogger('alerts')
 
-def active_untriggered_alert_symbols():
-    active_alerts = Alert.objects.filter(has_triggered = False, is_active = True)
-    alerts_symbols = active_alerts.values_list('stock_symbol', flat = True,).distinct()
-    return alerts_symbols    
-
 def evaluate_alerts():
     active_alerts = Alert.objects.filter(has_triggered = False, is_active = True)
     
@@ -25,4 +20,11 @@ def evaluate_alerts():
              threshold_trigger(alert = alert, current_prices = current_prices)
         elif alert.alert_type == 'duration':
               duration_trigger(alert = alert, current_prices = current_prices)
+              
+              
+def active_untriggered_alert_symbols():
+    active_alerts = Alert.objects.filter(has_triggered = False, is_active = True)
+    alerts_symbols = active_alerts.values_list('stock_symbol', flat = True,).distinct()
+    return alerts_symbols    
+
       

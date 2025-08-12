@@ -1,9 +1,10 @@
 from stock_alerts.settings import API_KEY
+
 import requests, logging
 logger = logging.getLogger('alerts')
 
 
-def request_for_prices(stock_symbols:list[str]):  #'AAPL','MSFT','GOOGL','TSLA','AMZN','META','NVDA','JPM','JNJ','PG'  
+def request_for_prices(stock_symbols:list[str]):
     prices = {}
     for symbol in stock_symbols:
         try:

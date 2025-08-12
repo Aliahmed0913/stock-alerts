@@ -1,7 +1,7 @@
 from users.models import User
 from alerts.models import Alert
 
-from django.core.mail import EmailMultiAlternatives ,EmailMessage
+from django.core.mail import EmailMessage
 from stock_alerts.settings import DEFAULT_FROM_EMAIL
 
 from django.template.loader import render_to_string
@@ -10,11 +10,10 @@ import logging
 
 logger = logging.getLogger('notifications')
 
-
-
-
 def publish_alerts_emails():
-    
+    """
+    Responsible of sending mail's (Gmail) for triggered alert to users there are ready to receive mail's  
+    """
     try:
         alerts_detail = alerts_should_mail()
         

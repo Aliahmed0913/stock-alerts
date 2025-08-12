@@ -1,8 +1,9 @@
-from rest_framework import serializers,validators
+from rest_framework import serializers
 from .models import Alert, TriggeredAlert
 from datetime import timedelta
 from stock_alerts.settings import STOCK_SYMBOLS
 from decimal import Decimal
+
 class AlertReadSerializer(serializers.ModelSerializer):
     class Meta():
         model = Alert

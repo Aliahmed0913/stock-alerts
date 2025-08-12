@@ -1,14 +1,18 @@
-from alerts.models import Alert,TriggeredAlert
-from users.models import User,UserNotificationSetting
+from alerts.models import TriggeredAlert
+from users.models import UserNotificationSetting
+
 from django.core.cache import cache
+
 from django.utils import timezone
-from datetime import datetime
 
 def alerts_should_mail():
-
+    """
+    Return list of tuples that hold user_id, alert and trigger_price
+    where alerts are pending and triggered at the same time the user enable to mail him 
+    """
     pending_alerts = TriggeredAlert.objects.filter(notification_status = TriggeredAlert.NotificationStatus.PENDING).select_related('alert__user')
-    
     users = {pending_alert.alert.user_id for pending_alert in pending_alerts}
+    
     notification_settings = {
     s.user_id: s
     for s in UserNotificationSetting.objects.filter(user_id__in=users, enable_email=True)
@@ -37,13 +41,16 @@ def alerts_should_mail():
     
 
 def store_success_mail(user,alert):
+    """
+    After send mail to user we marked that triggered alert has notify the user to avoid dublicate
+    """
     notification_settings = UserNotificationSetting.objects.get(user = user)
-    triggeredAlert = TriggeredAlert.objects.get(alert = alert, alert__user = user)
-   
     notification_settings.last_notified = timezone.now()
+    notification_settings.save(update_fields=['last_notified'])
+   
+    triggeredAlert = TriggeredAlert.objects.get(alert = alert, alert__user = user)
     triggeredAlert.notification_status = triggeredAlert.NotificationStatus.SENT
     triggeredAlert.notification_attempt_at = notification_settings.last_notified
     triggeredAlert.attempts_num += 1
-   
     triggeredAlert.save(update_fields=['notification_status', 'notification_attempt_at', 'attempts_num'])
-    notification_settings.save(update_fields=['last_notified'])
+   

@@ -19,6 +19,9 @@ class AlertViewSet(viewsets.ModelViewSet):
     
     @action(detail = False, methods = ['GET'], url_path ='triggered')
     def triggered_alerts(self, request):
+        """
+        Return list of triggered alerts attached to specific user
+        """
         triggered = TriggeredAlert.objects.filter(alert__user = self.request.user)
         if triggered.exists():
             serializer = TriggeredAlertSerializer(triggered, many = True)

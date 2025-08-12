@@ -32,6 +32,7 @@ class Alert(models.Model):
 
     
 class TriggeredAlert(models.Model):
+    
     class TriggeredMethod(models.TextChoices):
         THRESHOLD = 'threshold','THRESHOLD'
         DURATION = 'duration','DURATION'

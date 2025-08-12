@@ -17,15 +17,9 @@ import environ, os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-env = environ.Env(
-    DEBUG=(bool,False)
-)
-
+# serup environment variable 
+env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR,'.env'))
-
-
-API_KEY = env('API_KEY')
-STOCK_SYMBOLS = ['AAPL','MSFT','GOOGL','TSLA','AMZN','META','NVDA','JPM','JNJ','PG']
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -123,8 +117,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-# TIME_ZONE = 'UTC'
-
 USE_I18N = True
 
 USE_TZ = True
@@ -142,6 +134,30 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL='users.User'
+
+# Twelvedata api-key and data
+
+API_KEY = env('API_KEY')
+STOCK_SYMBOLS = ['AAPL','MSFT','GOOGL','TSLA','AMZN','META','NVDA','JPM','JNJ','PG']
+
+# celery configuration 
+
+from .celery_schedule import CELERY_BEAT_SCHEDULE
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
+# email confiuration 
+
+EMAIL_BACKEND=env('EMAIL_BACKEND')
+EMAIL_HOST=env('EMAIL_HOST')
+EMAIL_PORT=env('EMAIL_PORT')
+EMAIL_USE_TLS=env('EMAIL_USE_TLS')
+EMAIL_HOST_USER=env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD=env('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL=env('DEFAULT_FROM_EMAIL')
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES':[
@@ -165,17 +181,14 @@ CACHES = {
         }
     }
 }
-from .celery_schedule import CELERY_BEAT_SCHEDULE
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'UTC'
+
+
 
 LOGGING = {
-    'version': 1,  # Required by Python logging module
-    'disable_existing_loggers': False,  # Keeps Django's default logs
+    'version': 1, 
+    'disable_existing_loggers': False, 
 
-    'formatters': {  # How the log message will look
+    'formatters': { 
         'verbose': {
             'format': '[{asctime}] {levelname} in {name}: {message}',
             'style': '{',
@@ -187,20 +200,19 @@ LOGGING = {
     },
 
     'handlers': {
-        # Console handler → shows logs in terminal during development
         'console': {
             'class': 'logging.StreamHandler',
             'formatter': 'simple',
         },
 
-        # # File handler for ALL logs in production
+        # # File handler for notifications,email-related logs in production
         'file_notifications': {
             'class': 'logging.FileHandler',
             'filename': os.path.join(BASE_DIR, 'logs', 'notifications.log'),
             'formatter': 'verbose',
         },
 
-        # File handler only for alert/email-related logs
+        # File handler only for alert logs
         'file_alerts': {
             'class': 'logging.FileHandler',
             'filename': os.path.join(BASE_DIR, 'logs', 'alerts.log'),
@@ -209,14 +221,14 @@ LOGGING = {
     },
 
     'loggers': {
-        # Default Django logger (handles general logs)
+        # notifications logger
         'notifications': {
             'handlers': ['console', 'file_notifications'],
             'level': 'DEBUG',  
             'propagate': False,
         },
 
-        # Custom logger for alerts
+        # alerts logger
         'alerts': {
             'handlers': ['console', 'file_alerts'],
             'level': 'DEBUG',  
@@ -225,10 +237,3 @@ LOGGING = {
     },
 }
 
-EMAIL_BACKEND=env('EMAIL_BACKEND')
-EMAIL_HOST=env('EMAIL_HOST')
-EMAIL_PORT=env('EMAIL_PORT')
-EMAIL_USE_TLS=env('EMAIL_USE_TLS')
-EMAIL_HOST_USER=env('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD=env('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL=env('DEFAULT_FROM_EMAIL')
