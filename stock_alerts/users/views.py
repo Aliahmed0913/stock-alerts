@@ -8,15 +8,23 @@ from django.contrib.auth import get_user_model
 from .models import UserNotificationSetting
 # Create your views here.  IsAuthenticated
 user = get_user_model()
+
 @api_view(['POST','GET'])
 def register_user(request):
+    """
+    Return current user informations. create new user instance
+    
+    """
+    
     if request.method == 'POST':
         serializer = RegisterUserSerializer(data=request.data)
+       
         if serializer.is_valid():
             serializer.save()
             return Response({'message':'User created successfully',
                              'user':serializer.data},
                             status=status.HTTP_201_CREATED)
+       
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
    
     else:
@@ -27,6 +35,9 @@ def register_user(request):
 @api_view(['PATCH','GET'])
 @permission_classes([IsAuthenticated])
 def notification_setting_update(request):
+    """
+    Return and update user notification settings about receive email\'s .
+    """
     try:
         notification_setting = UserNotificationSetting.objects.get(user = request.user)
     except UserNotificationSerializer.DoesNotExist:

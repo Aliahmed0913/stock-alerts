@@ -13,6 +13,7 @@ class RegisterUserSerializer(serializers.ModelSerializer):
         UserNotificationSetting.objects.create(user = user)
         return user
     
+
 class UserNotificationSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(read_only = True)
     

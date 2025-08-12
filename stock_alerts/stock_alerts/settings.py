@@ -38,7 +38,10 @@ SECRET_KEY = env('SECRET_KEY')
 
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'ec2-35-175-209-46.compute-1.amazonaws.com']
 
 
 # Application definition
@@ -51,8 +54,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'alerts',
-    'core',
-    'tasks',
     'users',
     'rest_framework',
     'rest_framework_simplejwt',

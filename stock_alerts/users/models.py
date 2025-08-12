@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.validators import RegexValidator
-from django.contrib.auth.models import PermissionsMixin,AbstractUser 
+from django.contrib.auth.models import AbstractUser 
 from datetime import timedelta
 # Create your models here.
 
