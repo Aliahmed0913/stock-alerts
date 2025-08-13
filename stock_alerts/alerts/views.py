@@ -17,6 +17,11 @@ class AlertViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer:AlertCreateSerializer):
         serializer.save(user = self.request.user)
     
+    def get_serializer_class(self):
+        if self.action in ['create', 'update', 'partial_update']:
+            return AlertCreateSerializer
+        return AlertReadSerializer
+        
     @action(detail = False, methods = ['GET'], url_path ='triggered')
     def triggered_alerts(self, request):
         """
@@ -28,7 +33,3 @@ class AlertViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response({'Not found':'There is no triggered alert yet.'},status=status.HTTP_404_NOT_FOUND)
         
-    def get_serializer_class(self):
-        if self.action in ['create', 'update', 'partial_update']:
-            return AlertCreateSerializer
-        return AlertReadSerializer

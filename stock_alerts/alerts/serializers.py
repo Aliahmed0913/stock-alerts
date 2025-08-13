@@ -28,11 +28,19 @@ class AlertCreateSerializer(serializers.ModelSerializer):
    
     def validate(self, attrs):
         user = self.context['request'].user
-        alert_type = attrs.get('alert_type').strip().lower()
-        symbol = attrs.get('stock_symbol').strip().upper()
-        target_price = Decimal(attrs.get('target_price'))
-        comparison = attrs.get('comparison')
-        duration = attrs.get('duration')
+        alert_type = (attrs.get('alert_type') or self.instance.alert_type).strip().lower()
+        symbol = (attrs.get('stock_symbol') or self.instance.stock_symbol).strip().upper()
+        target_price = Decimal((attrs.get('target_price') or self.instance.target_price))
+        comparison = attrs.get('comparison') or self.instance.comparison
+        duration = attrs.get('duration') or self.instance.duration
+        
+        alert_conditions = {
+        'user': user,
+        'stock_symbol': symbol,
+        'comparison': comparison,
+        'target_price': target_price,
+        }
+        existing_alerts = Alert.objects.filter(**alert_conditions)
         
         if target_price <= 0.01 :
             raise serializers.ValidationError({'Price_issue':'Your target price can\'t be zero or less.'}) 
@@ -43,18 +51,9 @@ class AlertCreateSerializer(serializers.ModelSerializer):
         if alert_type =='threshold' :
             attrs['duration'] = timedelta(0)
         
-        alert_conditions = {
-        'user': user,
-        'stock_symbol': symbol,
-        'comparison': comparison,
-        'target_price': target_price,
-        }
-        
         if alert_type == 'duration':
             alert_conditions['duration'] = duration  
         
-        existing_alerts = Alert.objects.filter(**alert_conditions)
-         
         if self.instance:
             existing_alerts = existing_alerts.exclude(pk = self.instance.pk)
             
@@ -62,7 +61,11 @@ class AlertCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({
                 "Duplication_issue": f"You already have an alert for {symbol}."
             })
-            
+        
+        # handle lower and upper case in partialy update
+        if self.instance.alert_type or self.instance.stock_symbol:
+            attrs['alert_type'] = alert_type
+            attrs['stock_symbol'] = symbol
             
         return attrs
     
