@@ -54,18 +54,18 @@ class AlertCreateSerializer(serializers.ModelSerializer):
         if alert_type == 'duration':
             alert_conditions['duration'] = duration  
         
-        if self.instance:
+        if self.instance and (self.instance.alert_type or self.instance.stock_symbol):
+            # for dublication approch
             existing_alerts = existing_alerts.exclude(pk = self.instance.pk)
+            
+            # handle lower and upper case in partialy update
+            attrs['alert_type'] = alert_type
+            attrs['stock_symbol'] = symbol
             
         if existing_alerts.exists():
             raise serializers.ValidationError({
                 "Duplication_issue": f"You already have an alert for {symbol}."
             })
-        
-        # handle lower and upper case in partialy update
-        if self.instance.alert_type or self.instance.stock_symbol:
-            attrs['alert_type'] = alert_type
-            attrs['stock_symbol'] = symbol
             
         return attrs
     
