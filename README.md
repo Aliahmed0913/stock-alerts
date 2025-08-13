@@ -65,6 +65,7 @@ A Django stock price alert system for managing user defined alert rules and rece
 | `users/me/notification-settings`| GET    | Retrieve a user notification settings|
 | `alerts/`                       | GET    | List all alerts for request user     |
 | `alerts/`                       | POST   | Create a new stock alert             |
+| `alerts/<id>/`                  | PATCH  | Update stock alert                   |
 | `alerts/<id>/`                  | DELETE | Delete a stock alert by ID           |
 | `alerts/triggered/`             | GET    | List triggered alert for request user|
 
